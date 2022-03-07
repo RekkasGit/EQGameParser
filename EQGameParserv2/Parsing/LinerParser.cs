@@ -35,6 +35,10 @@ namespace EQGameParserv2.Parsing
 
         public static Boolean ParseDamage(string line, string previousLine, Dictionary<string, Character> data, ref Int64 timeBatchID, ref DateTime lastTimeForDamage)
         {
+
+            //no damage
+            if (line.EndsWith("but do no damage.")) return false;
+
             //damage you have recieved
             if (line.Contains("You have taken") || line.Contains("You were")) return false;
             
@@ -51,14 +55,14 @@ namespace EQGameParserv2.Parsing
             Boolean returnValue = false;
  
             //now lets process the line!
-            if (line.EndsWith(" damage.")) //normal damage
+            if (line.EndsWith(" damage.") || line.EndsWith(" damage. (Rampage)")) //normal damage
             {  //jump to the 1st ] for the datetime skip
                 Int32 index = line.IndexOf(']');
                 //get to the start of the character name
                 index += 2;
 
-                //we need to determine if this is an NPC or PC
                 //[Fri Mar 04 20:28:52 2022] Evinbard hit Temple Diabo Xi Va for 1120 points of non-melee damage.
+                //[Fri Feb 25 21:57:07 2022] Ture hits Jaykits for 2877 points of damage. (Rampage)
                 Int32 indexOfHitType = -1;
                 foreach (var hittype in validHitTypes)
                 {

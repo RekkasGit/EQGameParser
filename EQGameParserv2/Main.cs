@@ -56,8 +56,10 @@ namespace EQGameParserv2
                     }
                     stream= new System.IO.FileStream(openFileDialog.FileName, FileMode.OpenOrCreate, FileAccess.Read, FileShare.ReadWrite);
                     reader = new StreamReader(stream);
+                    listViewFights.Items.Clear();
+                    listView_Overview.Items.Clear();
                     _data.Clear();
-
+                    
                     _ProcessingTask = new Task(() => ProcessingLoop());
                     _ProcessingTask.Start();
 
@@ -302,7 +304,7 @@ namespace EQGameParserv2
         private void ProcessingLoop()
         {
             Int32 listViewCount = 0;
-
+        
             CultureInfo provider = CultureInfo.InvariantCulture;
             Int64 timeBatchID = 0;
             DateTime lastTimeForDamage = System.DateTime.MinValue;
