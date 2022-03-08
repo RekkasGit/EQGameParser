@@ -50,9 +50,9 @@ namespace EQGameParserv2
             this.columnHeaderOverview_MeleeCritDmg = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeaderOverview_SpellCritDmg = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeaderOverview_ID = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.tabPage2 = new System.Windows.Forms.TabPage();
             this.columnHeaderOverview_MeleeCritDmgPct = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeaderOverview_SpellCritDmgPct = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.tabPage2 = new System.Windows.Forms.TabPage();
             this.menuStrip1.SuspendLayout();
             this.tabControl_Overview.SuspendLayout();
             this.tabPage1.SuspendLayout();
@@ -223,16 +223,6 @@ namespace EQGameParserv2
             this.columnHeaderOverview_ID.Text = "#";
             this.columnHeaderOverview_ID.Width = 43;
             // 
-            // tabPage2
-            // 
-            this.tabPage2.Location = new System.Drawing.Point(4, 22);
-            this.tabPage2.Name = "tabPage2";
-            this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(1247, 670);
-            this.tabPage2.TabIndex = 1;
-            this.tabPage2.Text = "Player DPS";
-            this.tabPage2.UseVisualStyleBackColor = true;
-            // 
             // columnHeaderOverview_MeleeCritDmgPct
             // 
             this.columnHeaderOverview_MeleeCritDmgPct.Text = "MeeleeCrit Dmg%";
@@ -242,6 +232,16 @@ namespace EQGameParserv2
             // 
             this.columnHeaderOverview_SpellCritDmgPct.Text = "Spell Crit Dmg %";
             this.columnHeaderOverview_SpellCritDmgPct.Width = 101;
+            // 
+            // tabPage2
+            // 
+            this.tabPage2.Location = new System.Drawing.Point(4, 22);
+            this.tabPage2.Name = "tabPage2";
+            this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage2.Size = new System.Drawing.Size(1247, 670);
+            this.tabPage2.TabIndex = 1;
+            this.tabPage2.Text = "Player DPS";
+            this.tabPage2.UseVisualStyleBackColor = true;
             // 
             // Main
             // 
@@ -254,6 +254,7 @@ namespace EQGameParserv2
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "Main";
             this.Text = "Form1";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Main_FormClosing);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
             this.tabControl_Overview.ResumeLayout(false);

@@ -33,6 +33,46 @@ namespace EQGameParserv2.Parsing
             ," frenzies ", " frenzy"," gores ", " gore ", " mauls ", " maul ", " rends " , " shoots ", " shoot ", " slams ", " slam ", " slices ", " smashes ", " smash ", " stings "," sweeps ", " sweep ", " static fist hits "};
 
 
+        public static Boolean IsValidLine(string line)
+        {
+            /*
+            [Tue Feb 22 10:44:31 2022] You are not currently assigned to an adventure.
+            [Tue Feb 22 10:44:33 2022] A problem occurred when automatically launching the welcome screen on your last login.Auto - launching of the welcome screen has been disabled.You may invoke the welcome screen manually from the EQ menu.
+            [Tue Feb 22 10:44:33 2022] Announcing now off
+            [Tue Feb 22 10:44:34 2022] Welcome to EverQuest!
+            [Tue Feb 22 10:44:34 2022] You have entered The Plane of Knowledge.
+            [Tue Feb 22 10:44:34 2022] MESSAGE OF THE DAY: Welcome to Project Lazarus!Currently set in the Omens of War expansion.Please make sure you join us on discord @ https://discord.gg/qmSGhJq as most communications happen there first.  You can also find more information at lazaruseq.com  Make sure you are using the ROF2 client (see getting started on discord/wiki), and grab the server patch files from our discord.  The Titanium client (p99 install) is not supported.  Have fun and enjoy!  -Dhaymion
+            [Tue Feb 22 10:44:39 2022] GUILD MOTD: Devoure - Welcome to Tenacity!Please remember to sign up for raids as the sign - ups become available! Guid bank is working now!feel free to load it up!
+            [Tue Feb 22 10:44:39 2022] Channels: 1 = General(483), 2 = Shadowknight(31), 3 = Planes(280)
+           */
+            if (line.Contains("] There is ")) return false;
+            if (line.Contains(" says '")) return false;
+            if (line.Contains("] You feel different.")) return false;
+            if (line.Contains("] You are ")) return false;
+            if (line.Contains(" says out of character, '")) return false;
+            if (line.Contains(" tells you, '")) return false;
+            if (line.Contains(" your guild, '")) return false;
+            if (line.Contains(" your group, '")) return false;
+            if (line.Contains(" your party, '")) return false;
+            if (line.Contains(" your raid, '")) return false;
+            if (line.Contains(" tells the guild, '")) return false;
+            if (line.Contains(" tells the group, '")) return false;
+            if (line.Contains(" You feel replenished.")) return false;
+            if (line.Contains("]] You told ")) return false;
+            if (line.Contains("] MESSAGE OF THE DAY:")) return false;
+            if (line.Contains("] GUILD MOTD:")) return false;
+            if (line.Contains("] Channels:")) return false;
+            if (line.Contains("] You are not currently assigned to an adventure.")) return false;
+            if (line.Contains("] Announcing ")) return false;
+            if (line.Contains("] Welcome to EverQuest!")) return false;
+            if (line.Contains("] You have entered")) return false;
+            if (line.Contains(" regards you ")) return false;
+            if (line.Contains("] It will take ")) return false;
+            if (line.Contains("] A missed note brings " )) return false;
+            if (line.Contains("] The Universal Chat service")) return false;
+           
+            return true;
+        }
         public static Boolean ParseDamage(string line, string previousLine, Dictionary<string, Character> data, ref Int64 timeBatchID, ref DateTime lastTimeForDamage)
         {
 
@@ -252,6 +292,91 @@ namespace EQGameParserv2.Parsing
             }
             return returnValue;
         }
+        public static Boolean ParseEvent(string line, string previousLine, Dictionary<string, Character> data, ref Int64 timeBatchID, ref DateTime lastTimeForDamage)
+        {
+            //if we don't match, assume this is not a damage record
+            Boolean returnValue = false;
+            //[Fri Feb 25 21:24:57 2022] Jruhid begins to cast a spell. <Tempest Wind>
+            //[Fri Feb 25 21:57:14 2022] Speedhax is enveloped in the fierce eye aura.
+            //[Fri Feb 25 21:31:05 2022] Speedhax is consumed by the rhythm <Rhythm of the Night>
+            //[Tue Feb 22 10:46:37 2022] Heeler's casting is interrupted!
+            //[Fri Feb 25 21:23:41 2022] Ewiclip's body is consumed in rage.
+            if (line.Contains("begins to cast a spell. <"))
+            {
+                Int32 indexOfNameStart = line.IndexOf("]");
+                indexOfNameStart += 2;
+                Int32 indexOfNameEnd = line.IndexOf(" begins to cast a spell.");
+
+                string name = line.Substring(indexOfNameStart, indexOfNameEnd - indexOfNameStart);
+
+                Int32 indexOfEventNameStart = line.IndexOf("<");
+                indexOfNameStart += 1;
+                Int32 indexOfEventNameEnd = line.IndexOf(">");
+
+
+                string eventName = line.Substring(indexOfEventNameStart, indexOfEventNameEnd - indexOfEventNameStart);
+
+                return true;
+            }
+            else if(line.EndsWith(" was burned."))
+            {
+                //[Fri Feb 25 21:23:43 2022] Ewiclip was burned.
+
+            }
+            else if(line.Contains("casting is interrupted!"))
+            {
+                ////[Tue Feb 22 10:46:37 2022] Heeler's casting is interrupted!
+                ///
+                return true;
+            }
+            else if(line.Contains("  body is "))
+            {
+                ////[Fri Feb 25 21:23:41 2022] Ewiclip's body is consumed in rage.
+                return true;
+            }
+            else if (line.Contains(" is "))
+            {
+                //this is the final check, as " is " is far too common and want the before checks to act as filters
+                //[Fri Feb 25 21:57:14 2022] Speedhax is enveloped in the fierce eye aura.
+
+
+
+                Int32 indexOfNameStart = line.IndexOf("]");
+                
+
+                indexOfNameStart += 2;
+
+                Int32 indexOfIS = line.IndexOf(" ", indexOfNameStart);
+                indexOfIS += 1;
+                Int32 indexOfISEnd = line.IndexOf(" ", indexOfIS);
+
+                string isValue = line.Substring(indexOfIS, indexOfISEnd - indexOfIS);
+
+                if(isValue!="is")
+                {
+                    //this is not a valid is
+                    return false;
+                }
+
+                
+                Int32 indexOfNameEnd = line.IndexOf(" is ");
+                string name = line.Substring(indexOfNameStart, indexOfNameEnd - indexOfNameStart);
+                Int32 indexOfEventNameStart = indexOfNameEnd + 4;
+                Int32 indexOfEventNameEnd = line.IndexOf(".");
+
+
+                string eventname = line.Substring(indexOfEventNameStart, indexOfEventNameEnd - indexOfEventNameStart);
+
+
+
+                return true;
+            }
+
+
+
+            return returnValue;
+        }
+
 
     }
 

@@ -175,8 +175,18 @@ namespace EQGameParserv2
                         targetDamage[entry.Target].StartTime = entry.TimeStamp;
                     }
                     TargetDPS dpsEntry = targetDamage[entry.Target];
-                    dpsEntry.Damage += entry.Damage;
-                    dpsEntry.DamageCount += 1;
+                    if(entry.DamageType!= "directdmg")
+                    {
+                        dpsEntry.Damage += entry.Damage;
+                        dpsEntry.DamageCount += 1;
+                    } 
+                    else
+                    {
+                        dpsEntry.SpellDamage += entry.Damage;
+                        dpsEntry.SpellDamageCount += 1;
+                    }
+
+                   
                     if (entry.DamageMod == DamageModifier.Crit && entry.DamageType == "directdmg")
                     {
                         dpsEntry.SpellCritDamage += entry.Damage;
@@ -207,14 +217,14 @@ namespace EQGameParserv2
                     newItem.Text = person.Name;
 
                     newItem.SubItems.Add(pair.Key);
-                    newItem.SubItems.Add(pair.Value.Damage.ToString());
+                    newItem.SubItems.Add(pair.Value.TotalDamage.ToString());
                     newItem.SubItems.Add(totalDamage.ToString());
                     Int64 targetTimeForDps = (Int64)pair.Value.EndTime.Subtract(pair.Value.StartTime).TotalSeconds;
                     if (targetTimeForDps < 1)
                     {
                         targetTimeForDps = 1;
                     }
-                    newItem.SubItems.Add((pair.Value.Damage / targetTimeForDps).ToString());
+                    newItem.SubItems.Add((pair.Value.TotalDamage / targetTimeForDps).ToString());
                     newItem.SubItems.Add((totalDamage / totalTimeForDps).ToString());
                     newItem.SubItems.Add((pair.Value.CritDamage).ToString());
                     newItem.SubItems.Add((pair.Value.SpellCritDamage).ToString());
@@ -225,7 +235,7 @@ namespace EQGameParserv2
 
                     if (pair.Value.SpellCritDamageCount > 0)
                     {
-                        percentSpellCrit = ((Decimal)pair.Value.SpellCritDamageCount / (Decimal)pair.Value.DamageCount) * 100;
+                        percentSpellCrit = ((Decimal)pair.Value.SpellCritDamageCount / (Decimal)pair.Value.SpellDamageCount) * 100;
                         percentSpellCrit = Math.Round(percentSpellCrit, 2);
                     }
                     if (pair.Value.CritDamageCount > 0)
@@ -323,15 +333,25 @@ namespace EQGameParserv2
                         continue;
                     }
                     linecounter++;
-                    
-                    if (Parsing.LinerParser.ParseDamage(currentLine, previousLine, _data, ref timeBatchID, ref lastTimeForDamage))
-                    {
-                        countSinceLastReadLine = 0;
-                        hadDamageRecently = true;
 
+
+                    if(Parsing.LinerParser.IsValidLine(currentLine))
+                    {
+                        if (Parsing.LinerParser.ParseDamage(currentLine, previousLine, _data, ref timeBatchID, ref lastTimeForDamage))
+                        {
+                            countSinceLastReadLine = 0;
+                            hadDamageRecently = true;
+
+                        }
+                        else if (Parsing.LinerParser.ParseEvent(currentLine, previousLine, _data, ref timeBatchID, ref lastTimeForDamage))
+                        {
+
+                        }
                     }
 
-                    previousLine = currentLine;
+                  
+
+                        previousLine = currentLine;
                 }
                 else
                 {
@@ -445,5 +465,9 @@ namespace EQGameParserv2
 
         }
 
+        private void Main_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            _stopTask = true;
+        }
     }
 }
