@@ -53,9 +53,14 @@ namespace EQGameParserv2
             this.columnHeaderOverview_MeleeCritDmgPct = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeaderOverview_SpellCritDmgPct = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.tabPage3 = new System.Windows.Forms.TabPage();
+            this.listView1 = new System.Windows.Forms.ListView();
+            this.listView_Events_Characters = new System.Windows.Forms.ListView();
+            this.columnHeader_Event_Names_Name = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.menuStrip1.SuspendLayout();
             this.tabControl_Overview.SuspendLayout();
             this.tabPage1.SuspendLayout();
+            this.tabPage3.SuspendLayout();
             this.SuspendLayout();
             // 
             // menuStrip1
@@ -64,7 +69,7 @@ namespace EQGameParserv2
             this.fileToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(1551, 24);
+            this.menuStrip1.Size = new System.Drawing.Size(1510, 24);
             this.menuStrip1.TabIndex = 0;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -95,7 +100,7 @@ namespace EQGameParserv2
             this.listViewFights.Location = new System.Drawing.Point(12, 27);
             this.listViewFights.MultiSelect = false;
             this.listViewFights.Name = "listViewFights";
-            this.listViewFights.Size = new System.Drawing.Size(227, 692);
+            this.listViewFights.Size = new System.Drawing.Size(227, 919);
             this.listViewFights.TabIndex = 1;
             this.listViewFights.UseCompatibleStateImageBehavior = false;
             this.listViewFights.View = System.Windows.Forms.View.Details;
@@ -115,23 +120,25 @@ namespace EQGameParserv2
             // 
             this.tabControl_Overview.Controls.Add(this.tabPage1);
             this.tabControl_Overview.Controls.Add(this.tabPage2);
+            this.tabControl_Overview.Controls.Add(this.tabPage3);
             this.tabControl_Overview.Location = new System.Drawing.Point(245, 27);
             this.tabControl_Overview.Name = "tabControl_Overview";
             this.tabControl_Overview.SelectedIndex = 0;
-            this.tabControl_Overview.Size = new System.Drawing.Size(1255, 696);
+            this.tabControl_Overview.Size = new System.Drawing.Size(1255, 919);
             this.tabControl_Overview.TabIndex = 2;
+            this.tabControl_Overview.SelectedIndexChanged += new System.EventHandler(this.tabControl_Overview_SelectedIndexChanged);
             // 
             // tabPage1
             // 
+            this.tabPage1.BackColor = System.Drawing.Color.WhiteSmoke;
             this.tabPage1.Controls.Add(this.comboBoxTargets);
             this.tabPage1.Controls.Add(this.listView_Overview);
             this.tabPage1.Location = new System.Drawing.Point(4, 22);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(1247, 670);
+            this.tabPage1.Size = new System.Drawing.Size(1247, 893);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "Overview";
-            this.tabPage1.UseVisualStyleBackColor = true;
             // 
             // comboBoxTargets
             // 
@@ -161,9 +168,9 @@ namespace EQGameParserv2
             this.listView_Overview.FullRowSelect = true;
             this.listView_Overview.GridLines = true;
             this.listView_Overview.HideSelection = false;
-            this.listView_Overview.Location = new System.Drawing.Point(0, 20);
+            this.listView_Overview.Location = new System.Drawing.Point(0, 21);
             this.listView_Overview.Name = "listView_Overview";
-            this.listView_Overview.Size = new System.Drawing.Size(1247, 650);
+            this.listView_Overview.Size = new System.Drawing.Size(1241, 872);
             this.listView_Overview.TabIndex = 0;
             this.listView_Overview.UseCompatibleStateImageBehavior = false;
             this.listView_Overview.View = System.Windows.Forms.View.Details;
@@ -243,11 +250,54 @@ namespace EQGameParserv2
             this.tabPage2.Text = "Player DPS";
             this.tabPage2.UseVisualStyleBackColor = true;
             // 
+            // tabPage3
+            // 
+            this.tabPage3.BackColor = System.Drawing.Color.WhiteSmoke;
+            this.tabPage3.Controls.Add(this.listView1);
+            this.tabPage3.Controls.Add(this.listView_Events_Characters);
+            this.tabPage3.Location = new System.Drawing.Point(4, 22);
+            this.tabPage3.Name = "tabPage3";
+            this.tabPage3.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage3.Size = new System.Drawing.Size(1247, 670);
+            this.tabPage3.TabIndex = 2;
+            this.tabPage3.Text = "Events";
+            // 
+            // listView1
+            // 
+            this.listView1.GridLines = true;
+            this.listView1.HideSelection = false;
+            this.listView1.Location = new System.Drawing.Point(190, 6);
+            this.listView1.Name = "listView1";
+            this.listView1.Size = new System.Drawing.Size(1054, 661);
+            this.listView1.TabIndex = 1;
+            this.listView1.UseCompatibleStateImageBehavior = false;
+            this.listView1.View = System.Windows.Forms.View.Details;
+            // 
+            // listView_Events_Characters
+            // 
+            this.listView_Events_Characters.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.columnHeader_Event_Names_Name});
+            this.listView_Events_Characters.FullRowSelect = true;
+            this.listView_Events_Characters.GridLines = true;
+            this.listView_Events_Characters.HideSelection = false;
+            this.listView_Events_Characters.Location = new System.Drawing.Point(6, 6);
+            this.listView_Events_Characters.Name = "listView_Events_Characters";
+            this.listView_Events_Characters.Size = new System.Drawing.Size(178, 244);
+            this.listView_Events_Characters.TabIndex = 0;
+            this.listView_Events_Characters.UseCompatibleStateImageBehavior = false;
+            this.listView_Events_Characters.View = System.Windows.Forms.View.Details;
+            this.listView_Events_Characters.ItemSelectionChanged += new System.Windows.Forms.ListViewItemSelectionChangedEventHandler(this.listView_Events_Characters_ItemSelectionChanged);
+            // 
+            // columnHeader_Event_Names_Name
+            // 
+            this.columnHeader_Event_Names_Name.Text = "Name";
+            this.columnHeader_Event_Names_Name.Width = 174;
+            // 
             // Main
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1551, 736);
+            this.ClientSize = new System.Drawing.Size(1510, 958);
             this.Controls.Add(this.tabControl_Overview);
             this.Controls.Add(this.listViewFights);
             this.Controls.Add(this.menuStrip1);
@@ -259,6 +309,7 @@ namespace EQGameParserv2
             this.menuStrip1.PerformLayout();
             this.tabControl_Overview.ResumeLayout(false);
             this.tabPage1.ResumeLayout(false);
+            this.tabPage3.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -288,6 +339,10 @@ namespace EQGameParserv2
         private System.Windows.Forms.ColumnHeader columnHeaderOverview_ID;
         private System.Windows.Forms.ColumnHeader columnHeaderOverview_MeleeCritDmgPct;
         private System.Windows.Forms.ColumnHeader columnHeaderOverview_SpellCritDmgPct;
+        private System.Windows.Forms.TabPage tabPage3;
+        private System.Windows.Forms.ListView listView_Events_Characters;
+        private System.Windows.Forms.ListView listView1;
+        private System.Windows.Forms.ColumnHeader columnHeader_Event_Names_Name;
     }
 }
 

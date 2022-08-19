@@ -46,6 +46,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Extensions\ListViewExtensions.cs" />
     <Compile Include="Main.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -55,6 +56,7 @@
     <Compile Include="Models\Character.cs" />
     <Compile Include="Models\DamageEntry.cs" />
     <Compile Include="Models\Enum.cs" />
+    <Compile Include="Models\EventEntry.cs" />
     <Compile Include="Models\TargetDPS.cs" />
     <Compile Include="Parsing\LinerParser.cs" />
     <Compile Include="Program.cs" />

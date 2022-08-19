@@ -45,32 +45,60 @@ namespace EQGameParserv2.Parsing
             [Tue Feb 22 10:44:39 2022] GUILD MOTD: Devoure - Welcome to Tenacity!Please remember to sign up for raids as the sign - ups become available! Guid bank is working now!feel free to load it up!
             [Tue Feb 22 10:44:39 2022] Channels: 1 = General(483), 2 = Shadowknight(31), 3 = Planes(280)
            */
-            if (line.Contains("] There is ")) return false;
-            if (line.Contains(" says '")) return false;
-            if (line.Contains("] You feel different.")) return false;
-            if (line.Contains("] You are ")) return false;
-            if (line.Contains(" says out of character, '")) return false;
-            if (line.Contains(" tells you, '")) return false;
-            if (line.Contains(" your guild, '")) return false;
-            if (line.Contains(" your group, '")) return false;
-            if (line.Contains(" your party, '")) return false;
-            if (line.Contains(" your raid, '")) return false;
-            if (line.Contains(" tells the guild, '")) return false;
-            if (line.Contains(" tells the group, '")) return false;
-            if (line.Contains(" You feel replenished.")) return false;
-            if (line.Contains("]] You told ")) return false;
-            if (line.Contains("] MESSAGE OF THE DAY:")) return false;
-            if (line.Contains("] GUILD MOTD:")) return false;
-            if (line.Contains("] Channels:")) return false;
-            if (line.Contains("] You are not currently assigned to an adventure.")) return false;
-            if (line.Contains("] Announcing ")) return false;
-            if (line.Contains("] Welcome to EverQuest!")) return false;
-            if (line.Contains("] You have entered")) return false;
-            if (line.Contains(" regards you ")) return false;
-            if (line.Contains("] It will take ")) return false;
-            if (line.Contains("] A missed note brings " )) return false;
-            if (line.Contains("] The Universal Chat service")) return false;
-           
+            //perf opt, no need to do checks if we know this is a valid line.
+            
+            //note, this only works with 'EndsWith'
+            if (line.EndsWith(" damage.") || line.EndsWith(" damage. (Rampage)")) return true;
+            if (line.EndsWith(">")) return true;
+            if (line.EndsWith(" is interrupted!")) return true;
+            if (line.EndsWith(" spell fizzles!")) return true;
+            //[Fri Feb 25 21:24:57 2022] Jruhid begins to cast a spell. <Tempest Wind>
+            //[Fri Feb 25 21:57:14 2022] Speedhax is enveloped in the fierce eye aura.
+            //[Fri Feb 25 21:31:05 2022] Speedhax is consumed by the rhythm <Rhythm of the Night>
+            //[Tue Feb 22 10:46:37 2022] Heeler's casting is interrupted!
+            //[Fri Feb 25 21:23:41 2022] Ewiclip's body is consumed in rage.
+            //[Wed Mar 02 22:24:55 2022] Wenlowang's spell fizzles!
+            //end perf opt
+
+   
+            if (line.EndsWith(" cannot invite yourself.")) return false; //invite failed
+            if (line.EndsWith(" your group.")) return false; //invite failed
+            if (line.EndsWith(" the group.")) return false; //group join [Fri Mar 04 20:28:58 2022] You have joined the group.
+            if (line.Contains("] You invite ")) return false; //inviting
+            if (line.EndsWith(" song ends.")) return false; //bard spam
+            if (line.EndsWith(" song to a close!")) return false; //bard spam
+            if (line.EndsWith("] You are encumbered!")) return false; //status spam
+            if (line.Contains("] --")) return false; //loot message
+            if (line.Contains("] You have gained ")) return false; //xp message
+            if (line.Contains("] There is ")) return false; //] There is 1 player in EverQuest.
+            if (line.Contains(" says '")) return false; //says
+            if (line.Contains("] You feel different.")) return false; //random message
+            if (line.Contains("] You are ")) return false; //] You are idle, Auto-AFK
+            if (line.Contains(" says out of character, '")) return false; //ooc
+            if (line.Contains(" tells you, '")) return false;//tell
+            if (line.Contains(" guild, '")) return false;//guild
+            if (line.Contains(" party, '")) return false;//party
+            if (line.Contains(" raid, '")) return false;//raid
+            if (line.Contains(" group, '")) return false;//group
+            if (line.Contains(" auctions, '")) return false;//auction
+            if (line.Contains(" You feel replenished.")) return false; //bard spam
+            if (line.Contains("] A missed note brings ")) return false; //bard spam
+            if (line.Contains("] You told ")) return false; //tell
+            if (line.Contains("] MESSAGE OF THE DAY:")) return false;//motd
+            if (line.Contains("] GUILD MOTD:")) return false;//guildmotd
+            if (line.Contains("] Channels:")) return false;//channels
+            if (line.Contains("] The Universal Chat service")) return false; //chat service.
+            if (line.Contains("] You are not currently assigned to an adventure.")) return false; //adventure
+            if (line.Contains("] Announcing ")) return false; //anounce
+            if (line.Contains("] Welcome to EverQuest!")) return false;//welcome
+            if (line.Contains("] You have entered")) return false;//zone
+            if (line.Contains(" regards you ")) return false;//coning
+            if (line.Contains("] It will take ")) return false; //camping , ] It will take you about 30 seconds to prepare your camp.
+            if (line.Contains("] The Universal Chat service")) return false; //chat service.
+            if (line.Contains("] A problem occurred")) return false; //macroquest stuff
+            if (line.Contains("] Targeted (Player):")) return false; //kiss stuff?
+            if (line.Contains("] Right click on yourself to")) return false; //] Right click on yourself to bring up your own inspect window. Use the /toggleinspect
+          
             return true;
         }
         public static Boolean ParseDamage(string line, string previousLine, Dictionary<string, Character> data, ref Int64 timeBatchID, ref DateTime lastTimeForDamage)
@@ -120,7 +148,7 @@ namespace EQGameParserv2.Parsing
 
                 if(name=="You")
                 {
-                    //change to the name configured
+                    //TODO:change to the name configured
                     name = "Rekken";
                 }
 
@@ -301,6 +329,8 @@ namespace EQGameParserv2.Parsing
             //[Fri Feb 25 21:31:05 2022] Speedhax is consumed by the rhythm <Rhythm of the Night>
             //[Tue Feb 22 10:46:37 2022] Heeler's casting is interrupted!
             //[Fri Feb 25 21:23:41 2022] Ewiclip's body is consumed in rage.
+            //[Wed Mar 02 22:24:55 2022] Wenlowang's spell fizzles!
+            //[Wed Mar 02 22:24:55 2022] A lightning warrior ohm knight's enchantments fades.
             if (line.Contains("begins to cast a spell. <"))
             {
                 Int32 indexOfNameStart = line.IndexOf("]");
@@ -310,42 +340,170 @@ namespace EQGameParserv2.Parsing
                 string name = line.Substring(indexOfNameStart, indexOfNameEnd - indexOfNameStart);
 
                 Int32 indexOfEventNameStart = line.IndexOf("<");
-                indexOfNameStart += 1;
+                indexOfNameStart += 2;
                 Int32 indexOfEventNameEnd = line.IndexOf(">");
+                indexOfEventNameEnd -= 1;
 
+                string eventName = line.Substring(indexOfEventNameStart+1, indexOfEventNameEnd - indexOfEventNameStart);
 
-                string eventName = line.Substring(indexOfEventNameStart, indexOfEventNameEnd - indexOfEventNameStart);
+                EventEntry tmpEventEntry = new EventEntry();
+                tmpEventEntry.EventName = eventName;
+                AddEventEntry(data, name, timeBatchID, tmpEventEntry, line);
+
+                return true;
+            }
+            else if(line.EndsWith("'s enchantments fades."))
+            {
+                //[Wed Mar 02 22:24:55 2022] A lightning warrior ohm knight's enchantments fades.
+                Int32 indexOfNameStart = line.IndexOf("]");
+                indexOfNameStart += 2;
+                Int32 indexOfNameEnd = line.IndexOf("'s enchantments fades.");
+
+                string name = line.Substring(indexOfNameStart, indexOfNameEnd - indexOfNameStart);
+
+                string eventName = "enchantments fades";
+
+                EventEntry tmpEventEntry = new EventEntry();
+                tmpEventEntry.EventName = eventName;
+                AddEventEntry(data, name, timeBatchID, tmpEventEntry, line);
 
                 return true;
             }
             else if(line.EndsWith(" was burned."))
             {
                 //[Fri Feb 25 21:23:43 2022] Ewiclip was burned.
+                Int32 indexOfNameStart = line.IndexOf("]");
+                indexOfNameStart += 2;
+                Int32 indexOfNameEnd = line.IndexOf(" was burned.");
 
+                string name = line.Substring(indexOfNameStart, indexOfNameEnd - indexOfNameStart);
+
+                string eventName = "was burned";
+
+                EventEntry tmpEventEntry = new EventEntry();
+                tmpEventEntry.EventName = eventName;
+                AddEventEntry(data, name, timeBatchID, tmpEventEntry, line);
+
+                return true;
             }
-            else if(line.Contains("casting is interrupted!"))
+            else if (line.EndsWith("Your spell is interrupted."))
+            {
+                //[Fri Mar 04 21:35:16 2022] Your spell is interrupted.
+                
+                string name = "YOU";//TODO: Come back here to add current configured name
+
+                string eventName = "interrupted";
+
+                EventEntry tmpEventEntry = new EventEntry();
+                tmpEventEntry.EventName = eventName;
+                AddEventEntry(data, name, timeBatchID, tmpEventEntry, line);
+            }
+            else if (line.Contains("'s casting is interrupted!"))
             {
                 ////[Tue Feb 22 10:46:37 2022] Heeler's casting is interrupted!
-                ///
+            
+                Int32 indexOfNameStart = line.IndexOf("]");
+                indexOfNameStart += 2;
+                Int32 indexOfNameEnd = line.IndexOf("'s casting is interrupted!");
+
+                string name = line.Substring(indexOfNameStart, indexOfNameEnd - indexOfNameStart);
+
+                string eventName = "interrupted";
+
+                EventEntry tmpEventEntry = new EventEntry();
+                tmpEventEntry.EventName = eventName;
+                AddEventEntry(data, name, timeBatchID, tmpEventEntry, line);
                 return true;
             }
-            else if(line.Contains("  body is "))
+            else if (line.Contains("'s spell fizzles!"))
+            {
+                //[Wed Mar 02 22:24:55 2022] Wenlowang's spell fizzles!
+            
+                Int32 indexOfNameStart = line.IndexOf("]");
+                indexOfNameStart += 2;
+                Int32 indexOfNameEnd = line.IndexOf("'s spell fizzles!");
+
+                string name = line.Substring(indexOfNameStart, indexOfNameEnd - indexOfNameStart);
+
+                string eventName = "spell fizzle";
+
+                EventEntry tmpEventEntry = new EventEntry();
+                tmpEventEntry.EventName = eventName;
+                AddEventEntry(data, name, timeBatchID, tmpEventEntry, line);
+                return true;
+            }
+            else if(line.Contains("'s body is "))
             {
                 ////[Fri Feb 25 21:23:41 2022] Ewiclip's body is consumed in rage.
+
+                Int32 indexOfNameStart = line.IndexOf("]");
+                indexOfNameStart += 2;
+                Int32 indexOfIS = line.IndexOf(" ", indexOfNameStart);
+                indexOfIS += 1;
+                Int32 indexOfISEnd = line.IndexOf(" ", indexOfIS);
+
+                string isValue = line.Substring(indexOfIS, indexOfISEnd - indexOfIS);
+
+                if (isValue != "body")
+                {
+                    //this is not a valid body is
+                    return false;
+                }
+
+                Int32 indexOfNameEnd = line.IndexOf("'s body is ");
+                string name = line.Substring(indexOfNameStart, indexOfNameEnd - indexOfNameStart);
+                Int32 indexOfEventNameStart = indexOfNameEnd + 11;
+                Int32 indexOfEventNameEnd = line.Length - 1;
+                string eventName = line.Substring(indexOfEventNameStart, indexOfEventNameEnd - indexOfEventNameStart);
+
+                EventEntry tmpEventEntry = new EventEntry();
+                tmpEventEntry.EventName = eventName;
+                AddEventEntry(data, name, timeBatchID, tmpEventEntry, line);
+
                 return true;
+               
+            }
+            else if(line.EndsWith(">") && line.IndexOf("]  <")<1)
+            {
+                //Bards being special like always
+                List<string> validBardActions = new List<string>() {"is", "lets", "calls" };
+                //[Fri Feb 25 21:20:32 2022] Mintsong is consumed by the rhythm <Rhythm of the Night>
+                //[Fri Feb 25 21:07:08 2022] RabidBard lets loose a piercing blast. <Harmony of Sound>
+                Int32 indexOfNameStart = line.IndexOf("]");
+                indexOfNameStart += 2;
+                Int32 indexOfIS = line.IndexOf(" ", indexOfNameStart);
+                indexOfIS += 1;
+                Int32 indexOfISEnd = line.IndexOf(" ", indexOfIS);
+
+                string isValue = line.Substring(indexOfIS, indexOfISEnd - indexOfIS);
+
+                if (!validBardActions.Contains(isValue))
+                {
+                    //this is not a valid is
+                    return false;
+                }
+                Int32 indexOfNameEnd = line.IndexOf(" "+isValue+" ");
+                string name = line.Substring(indexOfNameStart, indexOfNameEnd - indexOfNameStart);
+             
+                Int32 indexOfEventNameStart = line.IndexOf("<");
+                indexOfNameStart += 2;
+                Int32 indexOfEventNameEnd = line.IndexOf(">");
+                indexOfEventNameEnd -= 1;
+
+                string eventName = line.Substring(indexOfEventNameStart + 1, indexOfEventNameEnd - indexOfEventNameStart);
+
+                EventEntry tmpEventEntry = new EventEntry();
+                tmpEventEntry.EventName = eventName;
+                AddEventEntry(data, name, timeBatchID, tmpEventEntry, line);
             }
             else if (line.Contains(" is "))
             {
                 //this is the final check, as " is " is far too common and want the before checks to act as filters
                 //[Fri Feb 25 21:57:14 2022] Speedhax is enveloped in the fierce eye aura.
-
-
+                //[Fri Feb 25 21:57:07 2022] Ture is bitten by an asp!
 
                 Int32 indexOfNameStart = line.IndexOf("]");
-                
-
                 indexOfNameStart += 2;
-
                 Int32 indexOfIS = line.IndexOf(" ", indexOfNameStart);
                 indexOfIS += 1;
                 Int32 indexOfISEnd = line.IndexOf(" ", indexOfIS);
@@ -358,16 +516,15 @@ namespace EQGameParserv2.Parsing
                     return false;
                 }
 
-                
                 Int32 indexOfNameEnd = line.IndexOf(" is ");
                 string name = line.Substring(indexOfNameStart, indexOfNameEnd - indexOfNameStart);
                 Int32 indexOfEventNameStart = indexOfNameEnd + 4;
-                Int32 indexOfEventNameEnd = line.IndexOf(".");
+                Int32 indexOfEventNameEnd = line.Length-1;
+                string eventName = line.Substring(indexOfEventNameStart, indexOfEventNameEnd - indexOfEventNameStart);
 
-
-                string eventname = line.Substring(indexOfEventNameStart, indexOfEventNameEnd - indexOfEventNameStart);
-
-
+                EventEntry tmpEventEntry = new EventEntry();
+                tmpEventEntry.EventName = eventName;
+                AddEventEntry(data, name, timeBatchID, tmpEventEntry, line);
 
                 return true;
             }
@@ -375,6 +532,29 @@ namespace EQGameParserv2.Parsing
 
 
             return returnValue;
+        }
+        private static void AddEventEntry(Dictionary<string, Character> data, string name, Int64 timeBatchID, EventEntry tmpEventEntry, string line)
+        {
+            string timeStamp = line.Substring(1, line.IndexOf("]") - 1);
+            DateTime linetimeStamp = DateTime.ParseExact(timeStamp, "ddd MMM dd HH:mm:ss yyyy", provider);
+            tmpEventEntry.RawData = line;
+            tmpEventEntry.TimeStamp = linetimeStamp;
+            Character tmpCharacter;
+            if (!data.ContainsKey(name))
+            {
+                tmpCharacter = new Character();
+                tmpCharacter.Name = name;
+                data.Add(name, tmpCharacter);
+            }
+            else
+            {
+                tmpCharacter = data[name];
+            }
+            if (!tmpCharacter.EventEntriesByTimeID.ContainsKey(timeBatchID))
+            {
+                tmpCharacter.EventEntriesByTimeID.Add(timeBatchID, new List<EventEntry>());
+            }
+            tmpCharacter.EventEntriesByTimeID[timeBatchID].Add(tmpEventEntry);
         }
 
 

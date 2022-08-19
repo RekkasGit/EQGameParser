@@ -12,6 +12,6 @@ namespace EQGameParserv2.Models
         public List<Character> Pets { get; set; }
 
         public Dictionary<Int64, List<DamageEntry>> DamageEntriesByTimeID = new Dictionary<long, List<DamageEntry>>();
-       
+        public Dictionary<Int64, List<EventEntry>>  EventEntriesByTimeID = new Dictionary<long, List<EventEntry>>();
     }
 }

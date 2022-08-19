@@ -11,6 +11,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using EQGameParserv2.Extensions;
 
 namespace EQGameParserv2
 {
@@ -23,13 +24,20 @@ namespace EQGameParserv2
         Task _ProcessingTask=null;
         private ListViewColumnSorter _lvwColumnSorter= new ListViewColumnSorter();
         System.Diagnostics.Stopwatch _stopWatch = new System.Diagnostics.Stopwatch();
+        private Int64 _viewedTimeBatchID = -1;
+        private TabPage _currenTabPage = null;
         public Main()
         {
             _stopWatch.Start();
             InitializeComponent();
+            //setting the default sorter
             this.listView_Overview.ListViewItemSorter = _lvwColumnSorter;
+
+            //this is needed to remove flickering from the list view control
+            this.listView_Overview.SetDoubleBuffered(true);
+            this.listViewFights.SetDoubleBuffered(true);
         }
-        
+        //File Open from the main menu
         private void loadLogToolStripMenuItem_Click(object sender, EventArgs e)
         {
 
@@ -66,19 +74,24 @@ namespace EQGameParserv2
                 }
             }
         }
-
+        //you selected a fight to view
         private void listViewFights_ItemSelectionChanged(object sender, ListViewItemSelectionChangedEventArgs e)
         {
+            if (e.IsSelected)
+            {
+                string timeBatchIDAsString = e.Item.Text;
+                Int64 timeBatchID = System.Int64.Parse(timeBatchIDAsString);
+                _viewedTimeBatchID = timeBatchID;
 
-            string timeBatchIDAsString = e.Item.Text;
-            Int64 timeBatchID = System.Int64.Parse(timeBatchIDAsString);
-            listView_Overview_Populate(timeBatchID, null);
-            //now sort by damage done
-            // Determine if clicked column is already the column that is being sorted.
-            listView_Overview_DefaultSort();
-
+                listView_Overview_Populate(timeBatchID, null);
+                //now sort by damage done
+                // Determine if clicked column is already the column that is being sorted.
+                listView_Overview_DefaultSort();
+                listView_Events_Characters_Populate();
+            }
 
         }
+
         private void listView_Overview_DefaultSort()
         {
             // Set the column number that is to be sorted; default to ascending.
@@ -302,11 +315,26 @@ namespace EQGameParserv2
             // Perform the sort with these new sort options.
             listView_Overview.Sort();
             listView_Overview.BeginUpdate();
-            Int32 counter = 1;
+            Int32 counter = 0;
+            string previousName = String.Empty;
             foreach (ListViewItem item in listView_Overview.Items)
             {
-               item.SubItems[8].Text = counter.ToString();
-               counter++;    
+                //if sort by total damage
+                if (e.Column == 3)
+                {
+                    if (previousName != item.SubItems[0].Text)
+                    {
+                        counter++;
+                    }
+                }
+                else
+                {
+                    counter++;
+                }
+                item.SubItems[8].Text = counter.ToString();
+                previousName = item.SubItems[0].Text;
+               
+               
             }
             listView_Overview.EndUpdate();
         }
@@ -468,6 +496,65 @@ namespace EQGameParserv2
         private void Main_FormClosing(object sender, FormClosingEventArgs e)
         {
             _stopTask = true;
+        }
+
+        private void tabControl_Overview_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            TabPage current = (sender as TabControl).SelectedTab;
+
+            _currenTabPage = current;
+
+            listView_Events_Characters_Populate();
+
+        }
+        private void listView_Events_Characters_Populate()
+        {
+            if (_currenTabPage != null && _currenTabPage.Name == "tabPage3" && _viewedTimeBatchID > -1)
+            {
+                //load tab3/Events
+                listView_Events_Characters.BeginUpdate();
+                listView_Events_Characters.Items.Clear();
+                List<Character> peopleInThisBatch = new List<Character>();
+                foreach (var person in _data.Values)
+                {
+                    if (person.DamageEntriesByTimeID.ContainsKey(_viewedTimeBatchID))
+                    {
+                        peopleInThisBatch.Add(person);
+                    }
+                }
+
+
+                foreach (var person in peopleInThisBatch)
+                {
+                    listView_Events_Characters.Items.Add(person.Name);
+                }
+
+                listView_Events_Characters.EndUpdate();
+
+
+            }
+        }
+
+        private void listView_Events_Characters_ItemSelectionChanged(object sender, ListViewItemSelectionChangedEventArgs e)
+        {
+            if (e.IsSelected)
+            {
+                string name = e.Item.Text;
+
+
+
+                string timeBatchIDAsString = e.Item.Text;
+                Int64 timeBatchID = System.Int64.Parse(timeBatchIDAsString);
+                _viewedTimeBatchID = timeBatchID;
+
+                listView_Overview_Populate(timeBatchID, null);
+                //now sort by damage done
+                // Determine if clicked column is already the column that is being sorted.
+                listView_Overview_DefaultSort();
+                listView_Events_Characters_Populate();
+            }
+
+
         }
     }
 }
